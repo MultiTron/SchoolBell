@@ -12,27 +12,28 @@ namespace SchoolBell
         public Form1()
         {
             InitializeComponent();
+            clockTimer.Start();
             times = new List<TimeOnly>()
             {
-                new TimeOnly(12, 15),
-                new TimeOnly(7, 59),
-                new TimeOnly(8, 40),
-                new TimeOnly(8, 49),
-                new TimeOnly(9, 30),
-                new TimeOnly(9, 39),
-                new TimeOnly(10, 20),
-                new TimeOnly(10, 49),
-                new TimeOnly(11, 30),
-                new TimeOnly(11, 39),
-                new TimeOnly(12, 20),
-                new TimeOnly(12, 29),
-                new TimeOnly(13, 10),
-                new TimeOnly(13, 19),
-                new TimeOnly(14)
+                new TimeOnly(9, 25, 00),
+                new TimeOnly(7, 59, 00),
+                new TimeOnly(8, 40, 00),
+                new TimeOnly(8, 49, 00),
+                new TimeOnly(9, 30, 00),
+                new TimeOnly(9, 39, 00),
+                new TimeOnly(10, 20, 00),
+                new TimeOnly(10, 49, 00),
+                new TimeOnly(11, 30, 00),
+                new TimeOnly(11, 39, 00),
+                new TimeOnly(12, 20, 00),
+                new TimeOnly(12, 29, 00),
+                new TimeOnly(13, 10, 00),
+                new TimeOnly(13, 19, 00),
+                new TimeOnly(14, 00, 00)
             };
             songs = new List<string>()
             {
-                "C:\\Users\\PC1\\Downloads\\Raina Popgeorgieva - Koi ushi bairaka Instumental.wav"
+                "C:\\Users\\MultiTron\\Documents\\Audacity\\F1 Ceremony Melody.mp3"
             };
             player = new WindowsMediaPlayer();
             playingTimer.Interval = 60000;
@@ -75,6 +76,11 @@ namespace SchoolBell
             startTimer.Stop();
             playingTimer.Stop();
             lblStatus.Text = "Stopped";
+        }
+
+        private void clockTimer_Tick(object sender, EventArgs e)
+        {
+            lblClock.Text = DateTime.Now.ToString("HH:mm:ss");
         }
     }
 }

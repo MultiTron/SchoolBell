@@ -34,6 +34,8 @@
             this.startTimer = new System.Windows.Forms.Timer(this.components);
             this.playingTimer = new System.Windows.Forms.Timer(this.components);
             this.lblStatus = new System.Windows.Forms.Label();
+            this.clockTimer = new System.Windows.Forms.Timer(this.components);
+            this.lblClock = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnStart
@@ -76,11 +78,26 @@
             this.lblStatus.TabIndex = 2;
             this.lblStatus.Text = "0";
             // 
+            // clockTimer
+            // 
+            this.clockTimer.Interval = 1;
+            this.clockTimer.Tick += new System.EventHandler(this.clockTimer_Tick);
+            // 
+            // lblClock
+            // 
+            this.lblClock.AutoSize = true;
+            this.lblClock.Location = new System.Drawing.Point(248, 9);
+            this.lblClock.Name = "lblClock";
+            this.lblClock.Size = new System.Drawing.Size(38, 15);
+            this.lblClock.TabIndex = 3;
+            this.lblClock.Text = "label1";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(546, 375);
+            this.Controls.Add(this.lblClock);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnStop);
             this.Controls.Add(this.btnStart);
@@ -98,5 +115,7 @@
         private System.Windows.Forms.Timer startTimer;
         private System.Windows.Forms.Timer playingTimer;
         private Label lblStatus;
+        private System.Windows.Forms.Timer clockTimer;
+        private Label lblClock;
     }
 }
