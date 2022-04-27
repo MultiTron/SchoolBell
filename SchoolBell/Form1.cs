@@ -1,13 +1,17 @@
 using System.Media;
-using WMPLib;
+using NAudio.Wave.SampleProviders;
+using NAudio.Wave;
 
 namespace SchoolBell
 {
     public partial class Form1 : Form
     {
         private List<TimeOnly> times;
-        private WindowsMediaPlayer player;
         private List<string> songs;
+        private WaveOutEvent outputDevice;
+        private AudioFileReader audioFile;
+        private FadeInOutSampleProvider fade;
+        private bool flag;
 
         public Form1()
         {
@@ -15,7 +19,9 @@ namespace SchoolBell
             clockTimer.Start();
             times = new List<TimeOnly>()
             {
-                new TimeOnly(9, 25, 00),
+                new TimeOnly(16, 44, 00),
+                new TimeOnly(13, 55, 00),
+                new TimeOnly(13, 58, 00),
                 new TimeOnly(7, 59, 00),
                 new TimeOnly(8, 40, 00),
                 new TimeOnly(8, 49, 00),
@@ -35,14 +41,19 @@ namespace SchoolBell
             {
                 "C:\\Users\\MultiTron\\Documents\\Audacity\\F1 Ceremony Melody.mp3"
             };
-            player = new WindowsMediaPlayer();
             playingTimer.Interval = 60000;
+            if (outputDevice == null)
+            {
+                outputDevice = new WaveOutEvent();
+                outputDevice.PlaybackStopped += OnPlaybackStopped;
+            }
+            listSongs.DataSource = songs;
         }
 
         private void btnStart_Click(object sender, EventArgs e)
         {
             startTimer.Start();
-            lblStatus.Text = "Armed";
+            picStatus.BackColor = Color.Green;
         }
 
         private void startTimer_Tick(object sender, EventArgs e)
@@ -51,36 +62,121 @@ namespace SchoolBell
             {
                 if (time == new TimeOnly(DateTime.Now.Hour, DateTime.Now.Minute))
                 {
-                    PopulateWithRandomSong();
-                    player.controls.play();
-                    playingTimer.Start();
+                    if (outputDevice.PlaybackState != PlaybackState.Playing)
+                    {
+                        RandomSong();
+                        outputDevice.Play();
+                        playingTimer.Start();
+                        if (time.Minute % 10 == 0)
+                        {
+                            flag = true;
+                        }
+                        else
+                        {
+                            flag = false;
+                        }
+                    }
                 }
             }
         }
 
-        private void PopulateWithRandomSong()
+        private void RandomSong()
         {
-            Random rand = new Random();
-            int randIndex = rand.Next(songs.Count);
-            player.URL = songs[randIndex];
+            Random rnd = new Random();
+            audioFile = new AudioFileReader(songs[rnd.Next(songs.Count)]);
+            fade = new FadeInOutSampleProvider(audioFile, true);
+            fade.BeginFadeIn(2000);
+            outputDevice.Init(fade);
         }
 
         private void playingTimer_Tick(object sender, EventArgs e)
         {
-            player.controls.stop();
-            playingTimer.Stop();
+            if (!flag) 
+            {
+                Fade();
+                outputDevice?.Stop();
+                playingTimer.Stop();
+            }
+            flag = false;
         }
 
         private void btnStop_Click(object sender, EventArgs e)
         {
+            outputDevice?.Stop();
             startTimer.Stop();
             playingTimer.Stop();
-            lblStatus.Text = "Stopped";
+            picStatus.BackColor = Color.Red;
         }
 
         private void clockTimer_Tick(object sender, EventArgs e)
         {
             lblClock.Text = DateTime.Now.ToString("HH:mm:ss");
+        }
+
+        private void OnPlaybackStopped(object sender, StoppedEventArgs args)
+        {
+            audioFile.Dispose();
+            audioFile = null;
+        }
+
+        private void volumeSlider1_VolumeChanged(object sender, EventArgs e)
+        {
+            outputDevice.Volume = volumeSlider1.Volume;
+        }
+        private void Fade()
+        {
+            fade.BeginFadeOut(2000);
+            Thread.Sleep(2000);
+        }
+
+        private void chkEdit_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkEdit.Checked)
+            {
+                panel1.Enabled = true;
+            }
+            else
+            {
+                panel1.Enabled = false;
+            }
+        }
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            saveFileDialog.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            saveFileDialog.ShowDialog();
+            using (FileStream fs = (FileStream)saveFileDialog.OpenFile())
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    foreach (var song in songs)
+                    {
+                        sw.WriteLine(song);
+                    }
+                }
+            }
+        }
+
+        private void btnLoad_Click(object sender, EventArgs e)
+        {
+            openFileDialog.ShowDialog();
+            using (FileStream fs = (FileStream)openFileDialog.OpenFile())
+            {
+                using (StreamReader sr = new StreamReader(fs))
+                {
+                    while (!sr.EndOfStream)
+                    {
+                        string line = sr.ReadLine();
+                        songs.Add(line);
+                    }
+                }
+            }
+        }
+
+        private void btnAddSong_Click(object sender, EventArgs e)
+        {
+            openFileDialog.ShowDialog();
+            songs.Add(openFileDialog.FileName);
         }
     }
 }
