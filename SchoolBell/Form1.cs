@@ -7,7 +7,6 @@ namespace SchoolBell
     public partial class Form1 : Form
     {
         private List<TimeOnly> times;
-        private List<string> songs;
         private WaveOutEvent outputDevice;
         private AudioFileReader audioFile;
         private FadeInOutSampleProvider fade;
@@ -19,27 +18,30 @@ namespace SchoolBell
             clockTimer.Start();
             times = new List<TimeOnly>()
             {
-                new TimeOnly(16, 44, 00),
-                new TimeOnly(13, 55, 00),
-                new TimeOnly(13, 58, 00),
+                new TimeOnly(9, 10, 00),
+                new TimeOnly(9, 13, 00),
+                new TimeOnly(9, 15, 00),
+                new TimeOnly(7, 55, 00),
                 new TimeOnly(7, 59, 00),
                 new TimeOnly(8, 40, 00),
+                new TimeOnly(8, 45, 00),
                 new TimeOnly(8, 49, 00),
                 new TimeOnly(9, 30, 00),
+                new TimeOnly(9, 35, 00),
                 new TimeOnly(9, 39, 00),
                 new TimeOnly(10, 20, 00),
+                new TimeOnly(10, 45, 00),
                 new TimeOnly(10, 49, 00),
                 new TimeOnly(11, 30, 00),
+                new TimeOnly(11, 35, 00),
                 new TimeOnly(11, 39, 00),
                 new TimeOnly(12, 20, 00),
+                new TimeOnly(12, 25, 00),
                 new TimeOnly(12, 29, 00),
                 new TimeOnly(13, 10, 00),
+                new TimeOnly(13, 15, 00),
                 new TimeOnly(13, 19, 00),
                 new TimeOnly(14, 00, 00)
-            };
-            songs = new List<string>()
-            {
-                "C:\\Users\\MultiTron\\Documents\\Audacity\\F1 Ceremony Melody.mp3"
             };
             playingTimer.Interval = 60000;
             if (outputDevice == null)
@@ -47,7 +49,7 @@ namespace SchoolBell
                 outputDevice = new WaveOutEvent();
                 outputDevice.PlaybackStopped += OnPlaybackStopped;
             }
-            listSongs.DataSource = songs;
+
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -83,7 +85,7 @@ namespace SchoolBell
         private void RandomSong()
         {
             Random rnd = new Random();
-            audioFile = new AudioFileReader(songs[rnd.Next(songs.Count)]);
+            audioFile = new AudioFileReader((string)listSongs.Items[rnd.Next(listSongs.Items.Count)]);
             fade = new FadeInOutSampleProvider(audioFile, true);
             fade.BeginFadeIn(2000);
             outputDevice.Init(fade);
@@ -149,7 +151,7 @@ namespace SchoolBell
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
-                    foreach (var song in songs)
+                    foreach (var song in listSongs.Items)
                     {
                         sw.WriteLine(song);
                     }
@@ -167,7 +169,7 @@ namespace SchoolBell
                     while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        songs.Add(line);
+                        listSongs.Items.Add(line);
                     }
                 }
             }
@@ -175,8 +177,11 @@ namespace SchoolBell
 
         private void btnAddSong_Click(object sender, EventArgs e)
         {
-            openFileDialog.ShowDialog();
-            songs.Add(openFileDialog.FileName);
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+
+                listSongs.Items.Add(openFileDialog.FileName);
+            }
         }
     }
 }
