@@ -18,9 +18,6 @@ namespace SchoolBell
             clockTimer.Start();
             times = new List<TimeOnly>()
             {
-                new TimeOnly(9, 10, 00),
-                new TimeOnly(9, 13, 00),
-                new TimeOnly(9, 15, 00),
                 new TimeOnly(7, 55, 00),
                 new TimeOnly(7, 59, 00),
                 new TimeOnly(8, 40, 00),
